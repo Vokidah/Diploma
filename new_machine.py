@@ -5,6 +5,7 @@ import itertools
 
 class Machine:
 
+    # Initialization of new automata
     def __init__(self):
         self.inputs = ["a", "b"]
         self.i = 0
@@ -16,6 +17,7 @@ class Machine:
         self.final_states = []
         self.states = [self.first_state, "Gb"]
 
+    # printint
     def show(self):
         print ''
         print len(self.states)
@@ -25,6 +27,7 @@ class Machine:
         print ''
         return
 
+    # creation of new transfer or transfer if it exists
     def new_transfer(self, state, letter, new_state=None):
         if not self.transfer_move(state, letter):
             new_state = str(self.i)
@@ -38,19 +41,18 @@ class Machine:
         else:
             return self.transfer_move(state, letter)
 
-    def add_transfer(self, first_state, letter, second_state):
-        if first_state not in self.transfers[letter]:
-            self.transfers[letter][first_state] = second_state
-
+    # transfer from current state to another
     def transfer_move(self, state, letter):
         if state not in self.transfers[letter]:
             return None
         return self.transfers[letter][state]
 
+    # transfer from current state to the garbage state
     def move_to_garbage(self, state, letter):
         self.transfers[letter][state] = "Gb"
         return "Gb"
 
+    # process of creating our automata
     def build(self, words, state=None):
         if not state or state == "Gb":
             state = self.first_state
@@ -77,6 +79,7 @@ class Machine:
             else:
                 self.move_to_garbage(state, letter)
 
+    #  checking word for correctness
     def check(self, word):
         state = self.first_state
         path = [state]
@@ -89,6 +92,7 @@ class Machine:
             return True
         return False
 
+    # creation of the hash that will have new states as a key and list of old_states as a value
     def create_new_transfers_hash(self, all_states):
         new_hash = {}
         new_states = []
@@ -110,6 +114,7 @@ class Machine:
 
         return new_hash
 
+    # X contains in Y
     def contains(self, X, Y):
         what_contains = []
         for x in X:
@@ -137,6 +142,7 @@ class Machine:
         self.transfers = new_transfers
         return garbage_state
 
+    # redirection of all states that lead to the garbage state to another random state
     def make_new_transfers(self, garbage_state):
         if garbage_state in self.states:
             self.states.remove(garbage_state)
@@ -151,9 +157,11 @@ class Machine:
                     id = random.randint(0, len(self.states)-1)
                     self.transfers[letter][state] = self.states[id]
 
+    # joining two states
     def combine(self, a, b):
         return (a, b)
 
+    # minimizing our automata
     def minimization(self):
         F = self.final_states
         NF = [x for x in self.states if x not in self.final_states]

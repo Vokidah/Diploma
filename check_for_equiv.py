@@ -1,28 +1,32 @@
 __author__ = 'vokidah'
+
 from main_machine import Automata
 from new_machine import Machine
 import random
 import decimal
 import json
 
-def readJSON(path):
-    return json.loads(open(path).read())
+
+# loading data from JSON file
+def readJSON(json_path):
+    return json.loads(open(json_path).read())
 
 
-def get_words(path):
-    f = open(path, 'r')
+# getting data from text file
+def get_words(words_path):
+    f = open(words_path, 'r')
     words = f.read().split(" ")
     return words
 
 
 path = "/home/vokidah/Documents/Diploma/automata.json"
-json_path = readJSON(path)
-automata = Automata(json_path)
+Json_path = readJSON(path)
+automata = Automata(Json_path)
 for i in range(1, 10000):
     string = ''.join(random.choice("ab") for x in range(random.randint(1, 6)))
     automata.check(string)
 
-automata.get_words()
+automata.set_words()
 print "LET'S GET IT"
 iterations = 0
 result = None
@@ -36,8 +40,8 @@ while result != 1:
     for i in range(0, n):
         string = ''.join(random.choice("ab") for x in range(random.randint(9, 11)))
         if mac.check(string) == automata.check(string):
-            count+=1
-    result = decimal.Decimal(count)/decimal.Decimal(n)
+            count += 1
+    result = decimal.Decimal(count) / decimal.Decimal(n)
     print result
     iterations += 1
 mac.minimization()
