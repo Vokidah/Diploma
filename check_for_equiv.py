@@ -23,36 +23,29 @@ path = "/home/vokidah/Documents/Diploma/automata.json"
 Json_path = readJSON(path)
 automata = Automata(Json_path)
 for i in range(1, 10000):
-    string = ''.join(random.choice("ab") for x in range(random.randint(1, 6)))
+    string = ''.join(random.choice("".join(automata.inputs)) for x in range(random.randint(1, 2*len(automata.states))))
     automata.check(string)
 
 automata.set_words()
-print "LET'S GET IT"
 iterations = 0
 result = None
 
 while result != 1:
-    mac = Machine()
+    mac = Machine(automata.inputs)
     mac.build(get_words("correct_words")[:-1])
-    mac.minimization()
+    mac.hopcroft_minimization()
     n = 100
     count = 0
     for i in range(0, n):
-        string = ''.join(random.choice("ab") for x in range(random.randint(9, 11)))
+        string = ''.join(random.choice("".join(automata.inputs)) for x in range(random.randint(16, 21)))
         if mac.check(string) == automata.check(string):
             count += 1
     result = decimal.Decimal(count) / decimal.Decimal(n)
     print result
     iterations += 1
-mac.minimization()
 print ''
-print iterations
+print "Iterations %s"%iterations
 print ''
-
-print automata.transfers_dict
-print automata.first_state
-print automata.states
-print ''
-print mac.transfers
-print mac.first_state
-print mac.states
+mac.hopcroft_minimization()
+print "Origin %s / Made %s"%(len(automata.states),len(mac.states))
+mac.show()
