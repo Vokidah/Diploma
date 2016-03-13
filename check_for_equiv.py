@@ -45,7 +45,7 @@ def get_words(words_path):
 
 
 
-path = "/home/vokidah/Documents/Diploma/automata2.json"
+path = "./Data/automata2.json"
 json_path = read_json(path)
 automata = Automata(json_path)
 
@@ -57,9 +57,9 @@ automata.set_words()
 iterations = 0
 while True:
     mac = Machine(automata.inputs)
-    mac.build(get_words("correct_words")[:-1])
+    mac.build(get_words("./Data/correct_words")[:-1])
     mac.hopcroft_minimization()
-    mac. uncheck_wrong(get_words("incorrect_words")[:-1], mac.first_state)
+    mac. uncheck_wrong(get_words("./Data/incorrect_words")[:-1], mac.first_state)
     mac.hopcroft_minimization()
     iterations += 1
     if compare(automata, mac, automata.first_state, mac.first_state, create_hash(automata), create_hash(mac)):

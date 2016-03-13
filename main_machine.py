@@ -26,11 +26,11 @@ class Automata():
 
     # separating words in 2 categories
     def set_words(self):
-        f_c = open("correct_words", 'w')
+        f_c = open("./Data/correct_words", 'w')
         for word in self.correct_words:
             f_c.write(word + " ")
         f_c.close()
-        f_i = open("incorrect_words", "w")
+        f_i = open("./Data/incorrect_words", "w")
         for word in self.incorrect_words:
             f_i.write(word + " ")
         f_i.close()
