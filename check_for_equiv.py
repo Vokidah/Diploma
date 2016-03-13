@@ -8,8 +8,32 @@ import json
 
 
 # loading data from JSON file
-def readJSON(json_path):
+def read_json(json_path):
     return json.loads(open(json_path).read())
+
+
+def create_hash(machine):
+    hash = {}
+    for input in machine.inputs:
+        hash[input] = {}
+        for state in machine.states:
+            hash[input][state] = False
+    return hash
+
+
+def compare(machine1, machine2, state1, state2, hash1, hash2):
+    if len(machine1.states)==len(machine2.states):
+        if (state1 in machine1.final_states and state2 in machine2.final_states) or (state1 not in machine1.final_states and state2 not in machine2.final_states):
+            for input in machine1.inputs:
+                if hash1[input][state1] == False and hash2[input][state2] == False:
+                    next_state1 = machine1.get_transition(state1, input)
+                    next_state2 = machine2.get_transition(state2, input)
+                    hash1[input][state1] = True
+                    hash1[input][state2] = True
+                    if not compare(machine1, machine2, next_state1, next_state2, hash1, hash2):
+                        return False
+            return True
+    return False
 
 
 # getting data from text file
@@ -19,33 +43,27 @@ def get_words(words_path):
     return words
 
 
-path = "/home/vokidah/Documents/Diploma/automata.json"
-Json_path = readJSON(path)
-automata = Automata(Json_path)
-for i in range(1, 10000):
+
+
+path = "/home/vokidah/Documents/Diploma/automata2.json"
+json_path = read_json(path)
+automata = Automata(json_path)
+
+for i in range(1, 100000):
     string = ''.join(random.choice("".join(automata.inputs)) for x in range(random.randint(1, 2*len(automata.states))))
     automata.check(string)
-
 automata.set_words()
-iterations = 0
-result = None
 
-while result != 1:
+iterations = 0
+while True:
     mac = Machine(automata.inputs)
     mac.build(get_words("correct_words")[:-1])
     mac.hopcroft_minimization()
-    n = 100
-    count = 0
-    for i in range(0, n):
-        string = ''.join(random.choice("".join(automata.inputs)) for x in range(random.randint(16, 21)))
-        if mac.check(string) == automata.check(string):
-            count += 1
-    result = decimal.Decimal(count) / decimal.Decimal(n)
-    print result
+    mac. uncheck_wrong(get_words("incorrect_words")[:-1], mac.first_state)
+    mac.hopcroft_minimization()
     iterations += 1
-print ''
+    if compare(automata, mac, automata.first_state, mac.first_state, create_hash(automata), create_hash(mac)):
+        break
+print(automata.transfers)
+print(mac.transfers)
 print "Iterations %s"%iterations
-print ''
-mac.hopcroft_minimization()
-print "Origin %s / Made %s"%(len(automata.states),len(mac.states))
-mac.show()

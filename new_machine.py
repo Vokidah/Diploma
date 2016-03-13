@@ -28,9 +28,9 @@ class Machine:
 
     # creation of new transfer or transfer if it exists
     def new_transfer(self, state, letter, new_state=None):
-        if not self.transfer_move(state, letter):
+        if not self.get_transition(state, letter):
             new_state = str(self.i)
-            self.i+=1
+            self.i += 1
             self.states.append(new_state)
             if letter in self.transfers:
                 self.transfers[letter][state] = new_state
@@ -38,10 +38,10 @@ class Machine:
                 self.transfers[letter] = {state: new_state}
             return new_state
         else:
-            return self.transfer_move(state, letter)
+            return self.get_transition(state, letter)
 
     # transfer from current state to another
-    def transfer_move(self, state, letter):
+    def get_transition(self, state, letter):
         if state not in self.transfers[letter]:
             return None
         return self.transfers[letter][state]
@@ -53,7 +53,7 @@ class Machine:
 
     # process of creating our automata
     def build(self, words, state=None):
-        if not state or state == "Gb":
+        if not state:
             state = self.first_state
         words_hash = {}
         for word in words:
@@ -65,15 +65,12 @@ class Machine:
                         words_hash[head] = [tail]
                     else:
                         words_hash[head].append(tail)
-            else:
-                if state not in self.final_states:
-                    self.final_states.append(state)
+            elif state not in self.final_states:
+                self.final_states.append(state)
+
         for letter in self.inputs:
             if letter in words_hash:
                 next_state = self.new_transfer(state, letter)
-                if '' in words_hash[letter]:
-                    if next_state not in self.final_states:
-                        self.final_states.append(next_state)
                 self.build(words_hash[letter], next_state)
             else:
                 self.move_to_garbage(state, letter)
@@ -85,7 +82,7 @@ class Machine:
         for letter in word:
             if letter not in self.inputs:
                 return False
-            state = self.transfer_move(state, letter)
+            state = self.get_transition(state, letter)
             path.append(state)
         if state in self.final_states:
             return True
@@ -132,7 +129,7 @@ class Machine:
             for letter in self.inputs:
                 X = []
                 for each in new_hash[state]:
-                    new_state = self.transfer_move(each, letter)
+                    new_state = self.get_transition(each, letter)
                     if new_state not in X:
                         X.append(new_state)
                 for another in self.states:
@@ -151,14 +148,32 @@ class Machine:
             for state in self.states:
                 if state == garbage_state:
                     del self.transfers[letter][state]
-                to_state = self.transfer_move(state, letter)
+                to_state = self.get_transition(state, letter)
                 if to_state == garbage_state:
                     id = random.randint(0, len(self.states)-1)
                     self.transfers[letter][state] = self.states[id]
 
-    # joining two states
-    def combine(self, a, b):
-        return (a, b)
+    def uncheck_wrong(self, words, state=None):
+        if not state:
+            state = self.first_state
+        words_hash = {}
+        for word in words:
+            if word != '':
+                head = word[0]
+                tail = word[1:]
+                if head in self.inputs:
+                    if head not in words_hash:
+                        words_hash[head] = [tail]
+                    else:
+                        words_hash[head].append(tail)
+            elif state in self.final_states:
+                    self.final_states.remove(state)
+        for letter in self.inputs:
+            if letter in words_hash:
+                next_state = self.get_transition(state, letter)
+                self.uncheck_wrong(words_hash[letter], next_state)
+            else:
+                return
 
     # minimizing our automata
     def hopcroft_minimization(self):
@@ -170,7 +185,7 @@ class Machine:
             for letter in self.inputs:
                 X = []
                 for each in self.states:
-                    new_state = self.transfer_move(each, letter)
+                    new_state = self.get_transition(each, letter)
                     if new_state in A and each not in X:
                         X.append(each)
                 if X:

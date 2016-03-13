@@ -1,5 +1,5 @@
 __author__ = 'vokidah'
-
+import random
 '''
     original automata with help of it we generate correct/incorrect words
      that we'll use to teach our new automata
@@ -11,7 +11,7 @@ class Automata():
     def __init__(self, dict):
         self.states = dict['states']
         self.inputs = dict['inputs']
-        self.transfers_dict = dict['transfers']
+        self.transfers = dict['transfers']
         self.final_states = dict['final_states']
         self.first_state = self.states[0]
         self.correct_words = []
@@ -19,7 +19,7 @@ class Automata():
 
     # transfer from current state to another
     def get_transition(self, curr_state, input_symbol):
-        trans_list = self.transfers_dict[input_symbol]
+        trans_list = self.transfers[input_symbol]
         if curr_state in trans_list:
             return trans_list[curr_state]
         return None
@@ -47,3 +47,4 @@ class Automata():
             return True
         self.incorrect_words.append(word)
         return False
+
