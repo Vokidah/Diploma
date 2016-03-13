@@ -4,6 +4,7 @@ Synthesis of CEP-machine by machine learning method
 
 
 Problem Statement and Key Hypothesis
+
 To answer on the principal question posed in the previous section of the
 paper in this section we formulate the key hypothesis of our study.
 The methods of interpolation functions inspired us to formulate the is-
